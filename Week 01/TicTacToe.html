@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Game</title>
+    <style>
+        #chess-board {
+            background-color: green;
+            border-collapse: collapse;
+        }
+        #chess-board td {
+            height: 100px;
+            width: 100px;
+            border: 2px solid black;
+            font-size: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <table id="chess-board"></table>
+</body>
+<script>
+    let boardPattern = [
+        0, 0, 0,
+        0, 1, 0,
+        0, 0, 0,
+    ];
+    let color = 2;
+
+    const showBoard = () => {
+        const tableElem = document.querySelector('#chess-board');
+        tableElem.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            let row = document.createElement('tr');
+            for (let j = 0; j < 3; j++) {
+                let cell = document.createElement('td');
+                let cellContent = boardPattern[i * 3 + j];
+                cell.innerText = cellContent ? (cellContent === 1 ? '⭕️': '❌') : '';
+                cell.addEventListener('click', () => {
+                    boardPattern[i * 3 + j] = color;
+                    if (checkWin(boardPattern, color)) {
+                        alert(`${color === 1 ? '⭕️': '❌'} wins`)
+                    }
+                    color = 3 - color;
+                    showBoard();
+                    if (checkWillWin(boardPattern, color)) {
+                        console.log(`${color === 1 ? '⭕️': '❌'} will win`)
+                    }
+                    computerMove();
+                });
+                row.appendChild(cell);
+            }
+            tableElem.appendChild(row);
+        }
+    };
+
+    const checkWin = (boardPattern, color) => {
+        for (let i = 0; i < 3; i++) {
+            // Compare with its rows
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+                if (boardPattern[i * 3 + j] !== color) win = false;
+            }
+
+            if (win) return true;
+        }
+
+        for (let j = 0; j < 3; j++) {
+            // Compare with its columms
+            let win = true;
+            for (let i = 0; i < 3; i++) {
+                // console.log(x,y, x, i);
+                if (boardPattern[i * 3 + j] !== color) win = false;
+            }
+
+            if (win) return true;
+        }
+
+        {
+            // Compare with left diagonal line
+            let win = true;
+            for (let i = 0; i < 3; i++) {
+                if (boardPattern[4 * i] !== color) win = false;
+            }
+
+            if (win) return true;
+        }
+
+        {
+            // Compare with right diagonal line
+            let win = true;
+            for (let i = 0; i < 3; i++) {
+                if (boardPattern[2 * i + 2] !== color) win = false;
+            }
+
+            if (win) return true;
+        }
+
+        return false;
+    }
+
+    const cloneArray = (arr) => JSON.parse(JSON.stringify(arr));
+    const checkWillWin = (boardPattern, color) => {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (boardPattern[i * 3 + j]) continue;
+
+                // Prefill cell with color and check if will win
+                let clonalBoard = cloneArray(boardPattern);
+                clonalBoard[i * 3 + j] = color;
+                if (checkWin(clonalBoard, color)) return [i, j];
+            }
+        }
+
+        return null;
+    };
+    const bestChoice = (pattern, color) => {
+        let point = checkWillWin(pattern, color);
+        if (point) {
+            return {
+                point,
+                result: 1,
+            }
+        }
+
+        let result = -1;
+        outer: for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (pattern[i * 3 + j] !== 0) continue;
+
+                let clonalBoard = cloneArray(pattern);
+                clonalBoard[i * 3 + j] = color;
+
+                // Check best choice of opponent
+                // If opponent wins, then we'll lose. So we need to compare our result with
+                // opponent's -result and see which one is better for us to choose
+                let predictedResult = bestChoice(clonalBoard, 3 - color).result;
+                if (-predictedResult >= result) {
+                    result = -predictedResult;
+                    point = [i, j];
+                }
+
+                if (result === 1) break outer;
+            }
+        }
+
+        return {
+            point,
+            result: point ? result : 0,
+        }
+    };
+
+    const computerMove = () => {
+        let choice = bestChoice(boardPattern, color);
+        
+        if (choice.point) {
+            boardPattern[choice.point[0] * 3 + choice.point[1]] = color;
+        }
+
+        if (checkWin(boardPattern, color)) {
+            alert(`${color === 1 ? '⭕️': '❌'} wins`);
+        }
+        color = 3 - color;
+        showBoard();
+    }
+
+    showBoard();
+</script>
+</html>

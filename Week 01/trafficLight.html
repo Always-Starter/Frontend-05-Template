@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light Flashing</title>
+    <style type="text/css">
+        .light-container {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-flow: row;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+
+        .light__color {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+        }
+
+        .light__red.active {
+            background-color: red;
+        }
+
+        .light__yellow.active {
+            background-color: yellow;
+        }
+
+        .light__green.active {
+            background-color: green;
+        }
+    </style>
+    <script type="text/javascript">
+        const sleep = time => new Promise((resolve, reject) => setTimeout(resolve, time));
+        const flashLight = async(index) => {
+            const sleepTime = [5000, 2000, 10000];
+            const lightColors = ['red', 'yellow', 'green'];
+            const allLights = document.querySelectorAll('.light__color');
+            allLights.forEach(item => item.classList.remove('active'));
+            console.log(index, index % 3, lightColors[index % 3]);
+            document.querySelector(`.light__${lightColors[index % 3]}`).classList.add('active');
+            await sleep(sleepTime[index % 3]);
+        }
+
+        const trafficLight = async () => {
+            for (let i = 2; ; i ++) {
+              await flashLight(i);
+            }
+        }
+
+        window.onload = function() {
+            trafficLight();
+        }
+
+
+    </script>
+</head>
+<body>
+    <div class="light-container">
+        <div class="light__red light__color"></div>
+        <div class="light__yellow light__color"></div>
+        <div class="light__green light__color active"></div>
+    </div>
+</body>
+</html>
