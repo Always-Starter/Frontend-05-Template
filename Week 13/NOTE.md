@@ -48,4 +48,17 @@ Explore Range & Selectin usage
 4. layout
     getClientRects()
     getBoundingClientRect()
+
+
+
+#### 标准化组织
+1. Khronos
+    WebGL
+2. ECMA
+    ECMAScript
+3. WHATWG
+    HTML
+4. W3C
+    webaudio
+    CG/WG
     
